@@ -15,7 +15,7 @@ export default {
       this.map = new maplibregl.Map({
         container: 'map',
         style: 'https://api.maptiler.com/maps/outdoor/style.json?key=Jit3oGuugSBYRmzQu0Qw',
-        center: [-74.5, 40], // starting position [lng, lat]
+        center: [-127.6476, 53.7267], // starting position [lng, lat]
         zoom: 9 // starting zoom
       });
     }
