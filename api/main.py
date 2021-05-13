@@ -2,9 +2,12 @@
 Main application entrypoint that initializes FastAPI
 """
 import time
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI
+from starlette.requests import Request
 from starlette.middleware.cors import CORSMiddleware
-from app.config import DATABASE_URI
+from app.db.session import Session as DBSession
+from app.middleware.limit_upload_size import LimitUploadSize
+from app.fisher.routes import router
 
 app = FastAPI(title="Fisher Habitat")
 
@@ -18,18 +21,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(LimitUploadSize, max_upload_size=50_000_000)
 
+@app.middleware("http")
+async def db_session_middleware(request: Request, call_next):
+    request.state.db = DBSession()
+    response = await call_next(request)
+    request.state.db.close()
+    return response
 
-def bgtask():
-    time.sleep(1)
-
-
-@app.get('/api/v1/hello/{hi}')
-def hello_world(hi: str):
-    """ function goes here """
-    return hi
-
-@app.get('/api/v1/background')
-def background(background_tasks: BackgroundTasks):
-    background_tasks.add_task(bgtask)
-    return {"message": "added background task"}
+app.include_router(router, prefix="/api/v1")
