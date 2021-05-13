@@ -49,13 +49,13 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
                 fisher_hab,
                 harvest_im,
                 denning_wa,
-                (denning_pr * shape_area) / 10000 as denning_pr,
+                denning_pr * (shape_area / 10000) as denning_pr,
                 branch_res,
-                (branch_r_1 * shape_area) / 10000 as branch_r_1,
+                branch_r_1 * (shape_area / 10000) as branch_r_1,
                 cavity_res,
-                (cavity_r_1 * shape_area) / 10000 as cavity_r_1,
-                (cwd_restin  * shape_area) / 10000 as cwd_restin,
-                (cwd_rest_1 * shape_area) / 10000 as cwd_rest_1
+                cavity_r_1 * (shape_area / 10000) as cavity_r_1,
+                cwd_restin * (shape_area / 10000) as cwd_restin,
+                cwd_rest_1 * (shape_area / 10000) as cwd_rest_1
         from    fisher_fhe
         where   ST_Intersects(
                     geom,
