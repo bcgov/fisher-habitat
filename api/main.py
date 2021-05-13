@@ -2,8 +2,12 @@
 Main application entrypoint that initializes FastAPI
 """
 import time
-from fastapi import FastAPI, HTTPException, BackgroundTasks, File, UploadFile
+from fastapi import FastAPI, HTTPException, BackgroundTasks, File, UploadFile,Depends
+from starlette.requests import Request
 from starlette.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from app.db.session import Session as DBSession
+from app.db.utils import get_db
 from app.config import DATABASE_URI
 from fastapi.responses import HTMLResponse
 from fastapi.encoders import jsonable_encoder
@@ -25,6 +29,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(LimitUploadSize, max_upload_size=50_000_000)
+
+@app.middleware("http")
+async def db_session_middleware(request: Request, call_next):
+    request.state.db = DBSession()
+    response = await call_next(request)
+    request.state.db.close()
+    return response
 
 def bgtask():
     time.sleep(1)
@@ -55,3 +66,16 @@ async def upload_file(shape: UploadFile = File(...)):
     
     file = jsonable_encoder({"imagePath":file_name})
     return {"filename": file_name}
+
+@app.get('/api/v1/dbexample')
+def dbexample(db: Session = Depends(get_db)):
+    """ function goes here """
+
+    q = """
+    select 42
+    """
+
+    result = db.execute(q)
+    result = result.fetchone()[0]
+
+    return result
