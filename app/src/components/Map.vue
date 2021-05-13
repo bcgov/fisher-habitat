@@ -38,21 +38,4 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
   #map {position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
-
-  .calculation-box {
-    height: 75px;
-    width: 150px;
-    position: absolute;
-    bottom: 40px;
-    left: 10px;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 15px;
-    text-align: center;
-  }
-
-  p {
-    font-family: 'Open Sans';
-    margin: 0;
-    font-size: 13px;
-  }
 </style>
