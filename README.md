@@ -1,7 +1,9 @@
 # fisher-habitat
 Fisher habitat web app for Ministry of Environment hackathon
 
-## Run the API service
+## API
+
+### Run the API service
 
 Optional: docker-compose
 ```sh
@@ -13,3 +15,7 @@ Run the FastAPI service directly
 cd api
 uvicorn main:app --reload
 ```
+
+### Access docs/endpoints
+
+http://localhost:8000/docs
