@@ -26,5 +26,5 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  #map {position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
+  #map {position: absolute; top: 80px; right: 0; bottom: 0; left: 0;}
 </style>

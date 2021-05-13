@@ -10,6 +10,8 @@ npm install
 npm run serve
 ```
 
+Visit the app at `http://localhost:8080`
+
 ### Compiles and minifies for production
 ```
 npm run build
