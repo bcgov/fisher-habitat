@@ -178,6 +178,11 @@ export default {
       });
 
       this.map.addControl(this.draw);
+
+      this.map.on('draw.create', this.updateReport());
+      this.map.on('draw.delete', this.updateReport());
+      this.map.on('draw.update', this.updateReport());
+
       this.map.on('load', () => {
         this.loadLayers()
       })
@@ -189,6 +194,12 @@ export default {
         .addTo(this.map)
       })
     },
+
+    updateReport: function () {
+      console.log('update report:');
+      console.log(this.draw.getAll());
+    },
+
     loadLayers: function () {
       // Load Fisher Range layer
       const loadFisherRange = () => {
