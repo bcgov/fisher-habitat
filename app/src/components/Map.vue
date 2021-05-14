@@ -178,10 +178,28 @@ export default {
       });
 
       this.map.addControl(this.draw);
+
+      this.map.on('draw.create', this.updateReport());
+      this.map.on('draw.delete', this.updateReport());
+      this.map.on('draw.update', this.updateReport());
+
       this.map.on('load', () => {
         this.loadLayers()
       })
+
+      this.map.on('click', 'fisher_range', (e) => {
+        new maplibregl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(this.popupHTML(e))
+        .addTo(this.map)
+      })
     },
+
+    updateReport: function () {
+      console.log('update report:');
+      console.log(this.draw.getAll());
+    },
+
     loadLayers: function () {
       // Load Fisher Range layer
       const loadFisherRange = () => {
@@ -250,6 +268,26 @@ export default {
       loadFisherFHE()
 
     },
+    popupHTML: function(info) {
+
+     return `<div class="popup">
+        <div><strong>FISHER RANGE</strong></div>
+        <div><span><strong>BCSEE Repo:</strong></span><span>  <a href="${info.features[0].properties['bcsee_repo']}" target="_blank">Link</a></span></div>
+        <div><span><strong>eng_name:</strong></span><span>  ${info.features[0].properties['eng_name']}</span></div>
+        <div><span><strong>bgc:</strong></span><span>  ${info.features[0].properties['bgc']}</span></div>
+        <div><span><strong>ecosecti_1:</strong></span><span>  ${info.features[0].properties['ecosecti_1']}</span></div>
+        <div><span><strong>ecosecti_2:</strong></span><span>  ${info.features[0].properties['ecosecti_2']}</span></div>
+        <div><span><strong>ecosection:</strong></span><span>  ${info.features[0].properties['ecosection']}</span></div>
+        <div><span><strong>elcode:</strong></span><span>  ${info.features[0].properties['elcode']}</span></div>
+        <div><span><strong>element_su:</strong></span><span>  ${info.features[0].properties['element_su']}</span></div>
+        <div><span><strong>parent_eco:</strong></span><span>  ${info.features[0].properties['parent_eco']}</span></div>
+        <div><span><strong>presence_1:</strong></span><span>  ${info.features[0].properties['presence_1']}</span></div>
+        <div><span><strong>presence_c:</strong></span><span>  ${info.features[0].properties['presence_c']}</span></div>
+        <div><span><strong>sci_name:</strong></span><span>  ${info.features[0].properties['sci_name']}</span></div>
+        <div><span><strong>Shape Area:</strong></span><span>  ${info.features[0].properties['shape_area']}</span></div>
+        <div><span><strong>shape_leng:</strong></span><span>  ${info.features[0].properties['shape_leng']}</span></div>
+     </div>`
+    },
 
     savePollygons: function () {
       console.log(this.draw.getAll());
@@ -291,6 +329,12 @@ export default {
     margin: 0;
     font-size: 20px;
   }
+
+  .mapboxgl-popup {
+    max-width: 400px;
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  }
+
 
 #map {
   position: absolute;
