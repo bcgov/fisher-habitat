@@ -3,12 +3,13 @@ Map layers (layers module) API endpoints/handlers.
 """
 import random
 import logging
-from fastapi import FastAPI, HTTPException, APIRouter, BackgroundTasks, File, UploadFile, Depends
+from fastapi import FastAPI, HTTPException, APIRouter, BackgroundTasks, File, UploadFile, Depends, Request
 from sqlalchemy.orm import Session
 from app.db.utils import get_db
 from app.fisher.cutblocks import load_cutblock
 from app.config import DATABASE_URI
 from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
 import os 
 
 router = APIRouter()
@@ -41,8 +42,7 @@ def dbexample(db: Session = Depends(get_db)):
 
     return result
 
-@router.get('/habitat')
-def habitat_in_polygon(db: Session = Depends(get_db)):
+def habitat_in_polygon(cutblock, db):
     """
     returns statistics about Fisher habitat within a cutblock polygon.
     Cutblock must be in BC Albers EPSG:3005.
@@ -75,22 +75,23 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
                 coalesce(cavity_res, 0) as cavity_res,
                 coalesce(cavity_r_1, 0) as cavity_r_1,
                 coalesce(cwd_restin, 0) as cwd_restin,
-                coalesce(cwd_rest_1, 0) as cwd_rest_1
+                coalesce(cwd_rest_1, 0) as cwd_rest_1,
+                version::numeric
         from    fisher_fhe f
         inner join cutblock c on ST_Intersects(ST_Transform(c.geom, 4326), f.geom)
     )
     select
         sum(denning_wa) as sum_denning_warning,
         ROUND(sum(denning_pr * area_ha)) as sum_denning_primary,
-        ROUND(sum(denning_pr * area_ha * 4)) as sum_denning_contingency,
+        ROUND(sum(denning_pr * area_ha) * 4) as sum_denning_contingency,
         ROUND(sum((denning_pr * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as denning_primary_density_cutblock,
         sum(branch_res) as sum_branch_resting_warning,
         ROUND(sum(branch_r_1  * area_ha)) as sum_branch_resting_primary,
-        ROUND(sum(branch_r_1  * area_ha * 4)) as sum_branch_resting_contingency,
+        ROUND(sum(branch_r_1  * area_ha) * 4) as sum_branch_resting_contingency,
         ROUND(sum((branch_r_1  * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as branch_resting_primary_density_cutblock,
         sum(cavity_res) as sum_cavity_resting_warning,
         ROUND(sum(cavity_r_1 * area_ha)) as sum_cavity_resting_primary,
-        ROUND(sum(cavity_r_1 * area_ha)) as sum_cavity_resting_primary,
+        ROUND(sum(cavity_r_1 * area_ha) * 4) as sum_cavity_resting_contingency,
         ROUND(sum((cavity_r_1 * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as cavity_resting_primary_density_cutblock,
         ROUND(sum(cwd_restin * area_ha)) as sum_resting_piece,
         ROUND(sum(cwd_rest_1 * area_ha)) as sum_resting_piles,
@@ -121,16 +122,18 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
                         geom
                 from fisher_habitats where harvest_im ilike 'WARNING: Harvest of this exceptionally rare%'
             ) t
-        ) as red_polygons
+        ) as red_polygons,
+        NOW() as create_date,
+        MIN(version) as version
     from fisher_habitats
     """
 
-    sample_cutblock = load_cutblock('/app/fixtures/cutblocks_sample.shp')
+    # sample_cutblock = load_cutblock('/app/fixtures/cutblocks_sample.shp')
 
     result = db.execute(
         q,
         {
-            "cutblock":sample_cutblock.wkt
+            "cutblock":cutblock.wkt
         }
     )
 
@@ -139,8 +142,8 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
     return result
 
   
-@router.post("/create_file/")
-async def upload_file(shape: UploadFile = File(...)):
+@router.post("/process_file")
+async def upload_file(shape: UploadFile = File(...), db: Session = Depends(get_db)):
     print(shape.file)
     try:
         os.mkdir("shapes")
@@ -152,5 +155,16 @@ async def upload_file(shape: UploadFile = File(...)):
         f.write(shape.file.read())
         f.close()
     
-    file = jsonable_encoder({"imagePath":file_name})
-    return {"filename": file_name}
+    # file = jsonable_encoder({"imagePath":file_name})
+
+    this_cutblock = load_cutblock(file_name)
+    result = habitat_in_polygon(this_cutblock, db)
+    return result
+
+@router.post("/process_drawing")
+def upload_drawing(shape: str, db: Session = Depends(get_db)):
+  this_cutblock = load_cutblock(shape)
+  print(this_cutblock)
+  result = habitat_in_polygon(this_cutblock, db)
+
+  return result

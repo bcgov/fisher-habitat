@@ -5,12 +5,11 @@
         
         <hr>
 
-        <!-- TODO: Do we get this data from the user? -->
-        <!-- <div><b>Forest License: </b>A93054</div>
-        <div><b>Cutting Permit: </b>93054</div>
-        <div><b>Analysis Date: </b>2021-05-14</div>
-        <div><b>Retention Spatial Data Version: </b>210215</div> -->
-        <!-- <br> -->
+        <div><b>Forest License: </b><b-form-input id="input-default" class="custom-input" placeholder="Enter Forest License"></b-form-input></div>
+        <div><b>Cutting Permit: </b><b-form-input id="input-default2" class="custom-input" placeholder="Enter Cutting Permit"></b-form-input></div>
+        <div><b>Analysis Date: </b>{{analysisDate || "-"}}</div>
+        <div><b>Retention Spatial Data Version: </b>{{retentionSpatialDataVersion || "-"}}</div>
+        <br>
 
         <h2>Summary Table</h2>
 
@@ -22,24 +21,24 @@
 
         <div><b>Denning Habitat</b></div>
         <!-- <div><b>Acb >52 cm dbh or At >40 cm dbh: </b>{{denningPrimary}}</div>
-        <div><b>Contigency: next-largest diameter Acb or At: </b>{{denningContingency}}</div>  -->
+        <div><b>Contingency: next-largest diameter Acb or At: </b>{{denningContingency}}</div>  -->
         <div><b>Primary: </b>{{denningPrimary}}</div>
-        <div><b>Contigency: </b>{{denningContingency}}</div> 
+        <div><b>Contingency: </b>{{denningContingency}}</div> 
         <br>
 
         <div><b>Branch Resting Habitat</b></div>
         <!-- <div><b>Sw >31 cm dbh or Sb >17 cm dbh with rust brooms: </b>{{branchRestingPrimary}}</div>
-        <div><b>Contigency: next-largest diameter Sw or any Sw with rust broom infection: </b>{{branchRestingContingency}}</div> -->
+        <div><b>Contingency: next-largest diameter Sw or any Sw with rust broom infection: </b>{{branchRestingContingency}}</div> -->
         <div><b>Primary: </b>{{branchRestingPrimary}}</div>
-        <div><b>Contigency: </b>{{branchRestingContingency}}</div>
+        <div><b>Contingency: </b>{{branchRestingContingency}}</div>
         <br>
 
         <div><b>Cavity Resting Habitat</b></div>
         <div><b>Primary: </b>{{cavityRestingPrimary}}</div>
-        <div><b>Contigency: </b>{{cavityRestingContingency}}</div>        
+        <div><b>Contingency: </b>{{cavityRestingContingency}}</div>        
         <!-- TODO: What is the correct text here? -->
         <!-- <div><b>???: </b>{{cavityRestingPrimary}}</div>
-        <div><b>Contigency: ???: </b>{{cavityRestingContingency}}</div> -->
+        <div><b>Contingency: ???: </b>{{cavityRestingContingency}}</div> -->
         <br>
 
         <div><b>Coarse Woody Debris Resting Habitat</b></div>
@@ -53,12 +52,23 @@
 </template>
 
 <script>
+import axios from 'axios';
+
+import {API_BASE_URL} from '../consts'
 export default {
   name: "Report",
+  mounted () {
+    axios.get(`${API_BASE_URL}/v1/habitat`)
+    .then(response => {
+      this.updateReport(response.data)
+    })
+  },
   data: function() {
     return {
+      analysisDate: null,
+      retentionSpatialDataVersion: null,
       shapeArea: 0,
-      harvestImpactWarning: false,
+      harvestImpactWarning: null,
       denningPrimary: 0,
       denningContingency: 0,
       branchRestingPrimary: 0,
@@ -70,6 +80,20 @@ export default {
       warningsYellow: [],
       warningsRed: []
     }
+  },
+  methods: {
+    updateReport (habitatInfo) {
+      this.analysisDate = habitatInfo['create_date']
+      this.retentionSpatialDataVersion = habitatInfo['version']
+      this.harvestImpactWarning = habitatInfo['sum_denning_warning'] // TODO: Is this the right field?
+      this.denningContingency = habitatInfo['sum_denning_primary']
+      this.denningPrimary = habitatInfo['sum_denning_contingency']
+      this.branchRestingPrimary = habitatInfo['sum_branch_resting_primary']
+      this.branchRestingContingency = habitatInfo['sum_branch_resting_contingency']
+      this.cavityRestingPrimary = habitatInfo['sum_cavity_resting_primary']
+      this.debrisRestingPieces = habitatInfo['sum_resting_piece']
+      this.debrisRestingPiles = habitatInfo['sum_resting_piles']
+    }
   }
 }
 </script>
@@ -78,5 +102,12 @@ export default {
 <style scoped>
 #report {
   text-align: left;
+}
+.custom-input {
+  border: none !important;
+  box-shadow: none !important;
+  display: inline;
+  padding: 0;
+  max-width: 200px;
 }
 </style>
