@@ -37,8 +37,8 @@ export default {
 
       // Define bounds that conform to the `LngLatBoundsLike` object.
       var bounds = [
-        [-139.06, 48.30], // [west, south]
-        [-114.03, 60.00]  // [east, north]
+        [-140.06, 47.30], // [west, south]
+        [-113.03, 61.00]  // [east, north]
       ];
 
       // Set the map's max bounds.
