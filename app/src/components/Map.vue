@@ -7,7 +7,9 @@
         <button type="button" class="btn btn-primary" v-on:click="savePollygons">Save All Pollygons</button>
       </div>
     </div>
-    <div id='actions'></div>
+    <div class="report">
+      <Report></Report>
+    </div>
   </div>
 </template>
 
@@ -15,9 +17,12 @@
 import maplibregl from 'maplibre-gl'; // or "const maplibregl = require('maplibre-gl');"
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
+import Report from "./Report";
+
 const TILE_SERVER_FISHER = 'http://localhost:7800/'
 export default {
   name: 'Map',
+  components: {Report},
   mounted() {
     this.createMap()
   },
@@ -260,6 +265,15 @@ export default {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 15px;
   }
+  .report {
+    height: 125px;
+    width: calc(100vw - 70%);
+    position: absolute;
+    top: 80px;
+    left: 0px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 15px;
+  }
 
   p {
     text-align: left;
@@ -271,9 +285,10 @@ export default {
 
 #map {
   position: absolute;
+  width:100vw;
   top: 80px;
   right: 0;
   bottom: 0;
-  left: 0;
+  left: calc(100vw - 70%);
 }
 </style>
