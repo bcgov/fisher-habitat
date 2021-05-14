@@ -75,7 +75,8 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
                 coalesce(cavity_res, 0) as cavity_res,
                 coalesce(cavity_r_1, 0) as cavity_r_1,
                 coalesce(cwd_restin, 0) as cwd_restin,
-                coalesce(cwd_rest_1, 0) as cwd_rest_1
+                coalesce(cwd_rest_1, 0) as cwd_rest_1,
+                version::numeric
         from    fisher_fhe f
         inner join cutblock c on ST_Intersects(ST_Transform(c.geom, 4326), f.geom)
     )
@@ -121,7 +122,9 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
                         geom
                 from fisher_habitats where harvest_im ilike 'WARNING: Harvest of this exceptionally rare%'
             ) t
-        ) as red_polygons
+        ) as red_polygons,
+        NOW() as create_date,
+        MIN(version) as version
     from fisher_habitats
     """
 
