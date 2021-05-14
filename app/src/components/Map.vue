@@ -285,7 +285,6 @@ export default {
 
 #map {
   position: absolute;
-  width:100vw;
   top: 80px;
   right: 0;
   bottom: 0;
