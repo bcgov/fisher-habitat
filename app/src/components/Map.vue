@@ -3,9 +3,20 @@
     <div id='map'></div>
     <div class="report">
       <Report></Report>
+
       <div class="save-button">
         <button type="button" class="btn btn-primary" v-on:click="savePollygons">Generate Report</button>
       </div>
+
+        <div class="file-up">
+          <div>upload custom shape file:</div>
+          <!-- Plain mode -->
+          <b-form-file v-model="file" class="mt-3" plain></b-form-file>
+        </div>
+
+        <div class="save-button">
+          <button type="button" class="btn btn-primary" v-on:click="uploadFile">Upload File</button>
+        </div>
     </div>
   </div>
 </template>
@@ -285,8 +296,8 @@ export default {
      </div>`
     },
 
-    savePollygons: function () {
-      console.log(this.draw.getAll());
+    uploadFile: function () {
+      console.log(this.file);
     }
   }
 }
@@ -295,6 +306,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+  .file-up {
+    text-align: left;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
   .save-button {
     text-align: left;
   }
@@ -319,8 +336,6 @@ export default {
 
   p {
     text-align: left;
-    padding-left: 20px;
-    font-family: 'Open Sans';
     margin: 0;
     font-size: 20px;
   }
