@@ -5,6 +5,7 @@
 <script>
 import maplibregl from 'maplibre-gl'; // or "const maplibregl = require('maplibre-gl');"
 
+const TILE_SERVER_FISHER='http://localhost:7800/'
 export default {
   name: 'Map',
   mounted () {
@@ -23,7 +24,7 @@ export default {
         // Load Fisher Range layer
         this.map.addSource('fisher_range', {
           type: 'vector',
-          tiles: ['http://localhost:7800/public.fisher_range/{z}/{x}/{y}.pbf'],
+          tiles: [`${TILE_SERVER_FISHER}/public.fisher_range/{z}/{x}/{y}.pbf`],
           'source-layer': 'fisher_range',
           'minzoom': 0,
           'maxzoom': 22
