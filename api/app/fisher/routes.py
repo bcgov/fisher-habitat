@@ -162,11 +162,8 @@ async def upload_file(shape: UploadFile = File(...), db: Session = Depends(get_d
     return result
 
 
-
-
 class ShapeRequest(BaseModel):
     shape: str
-
 
 @router.post("/process_drawing")
 def upload_drawing(payload: ShapeRequest, db: Session = Depends(get_db)):

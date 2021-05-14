@@ -2,7 +2,7 @@
   <div>
     <div id='map'></div>
     <div class="report">
-      <Report></Report>
+      <Report :habitatInfo="habitatInfo"></Report>
 
       <div class="save-button">
         <button type="button" class="btn btn-primary" v-on:click="generateReport">Generate Report</button>
@@ -35,6 +35,11 @@ export default {
   components: {Report},
   mounted() {
     this.createMap()
+  },
+  data () {
+    return {
+      habitatInfo: null
+    }
   },
   methods: {
     createMap: function () {
@@ -207,7 +212,7 @@ export default {
       
       axios.post(`${API_BASE_URL}/v1/process_drawing`,  { shape: JSON.stringify(this.draw.getAll())})
       .then(response => {
-        Report.updateReport(response.data)
+        this.habitatInfo = response.data
       })
     },
 

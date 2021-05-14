@@ -57,6 +57,7 @@ import axios from 'axios';
 import {API_BASE_URL} from '../consts'
 export default {
   name: "Report",
+  props: ['habitatInfo'],
   mounted () {
     axios.get(`${API_BASE_URL}/v1/habitat`)
     .then(response => {
@@ -93,6 +94,16 @@ export default {
       this.cavityRestingPrimary = habitatInfo['sum_cavity_resting_primary']
       this.debrisRestingPieces = habitatInfo['sum_resting_piece']
       this.debrisRestingPiles = habitatInfo['sum_resting_piles']
+    }
+  },
+  watch: {
+    habitatInfo: {
+      deep: true,
+      handler: function (v) {
+        if (v) {
+          this.updateReport(v)
+        }
+      }
     }
   }
 }
