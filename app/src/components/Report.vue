@@ -6,12 +6,11 @@
         <hr>
 
         <!-- TODO: Do we get this data from the user? -->
-        <div><b>Forest License: </b>A93054</div>
+        <!-- <div><b>Forest License: </b>A93054</div>
         <div><b>Cutting Permit: </b>93054</div>
         <div><b>Analysis Date: </b>2021-05-14</div>
-        <div><b>Retention Spatial Data Version: </b>210215</div>
-
-        <br>
+        <div><b>Retention Spatial Data Version: </b>210215</div> -->
+        <!-- <br> -->
 
         <h2>Summary Table</h2>
 
@@ -36,7 +35,6 @@
         <br>
 
         <div><b>Cavity Resting Habitat</b></div>
-        <!-- TODO: If values are 0, render: <div>No retention needed for this habitat feature.</div> -->
         <div><b>Primary: </b>{{cavityRestingPrimary}}</div>
         <div><b>Contigency: </b>{{cavityRestingContingency}}</div>        
         <!-- TODO: What is the correct text here? -->
@@ -51,11 +49,6 @@
         <div><b>Creation: </b><small>piles that are at least 3m x 5m and 2m high built with logs >10 cm diam. (no tops or fines), jumbled like pick-up sticks, with 1/3 of logs >20 cm diam. and >3 m long</small> <b>{{debrisRestingPiles}}</b></div> -->
         <br>
 
-        <!-- TODO: How to render each warning/caution area? -->
-        <div><b>Warning Areas</b></div>
-        <div>???</div>
-        <br>
-
   </div>
 </template>
 
@@ -64,18 +57,18 @@ export default {
   name: "Report",
   data: function() {
     return {
-      shapeArea: 244.4,
+      shapeArea: 0,
       harvestImpactWarning: false,
-      denningPrimary: 1650,
-      denningContingency: 6599,
-      branchRestingPrimary: 55,
-      branchRestingContingency:221,
+      denningPrimary: 0,
+      denningContingency: 0,
+      branchRestingPrimary: 0,
+      branchRestingContingency: 0,
       cavityRestingPrimary: 0,
       cavityRestingContingency: 0,
-      debrisRestingPieces: 342,
-      debrisRestingPiles: 99,
-      cautions: [],
-      warnings: []
+      debrisRestingPieces: 0,
+      debrisRestingPiles: 0,
+      warningsYellow: [],
+      warningsRed: []
     }
   }
 }
