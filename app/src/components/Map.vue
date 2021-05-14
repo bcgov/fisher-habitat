@@ -1,14 +1,17 @@
 <template>
-  <div id='map'></div>
+  <div>
+    <div id='map'></div>
+    <div id='actions'></div>
+  </div>
 </template>
 
 <script>
 import maplibregl from 'maplibre-gl'; // or "const maplibregl = require('maplibre-gl');"
 
-const TILE_SERVER_FISHER='http://localhost:7800/'
+const TILE_SERVER_FISHER = 'http://localhost:7800/'
 export default {
   name: 'Map',
-  mounted () {
+  mounted() {
     this.createMap()
   },
   methods: {
@@ -21,7 +24,12 @@ export default {
       });
 
       this.map.on('load', () => {
-        // Load Fisher Range layer
+        this.loadLayers()
+      })
+    },
+    loadLayers: function () {
+      // Load Fisher Range layer
+      const loadFisherRange = () => {
         this.map.addSource('fisher_range', {
           type: 'vector',
           tiles: [`${TILE_SERVER_FISHER}/public.fisher_range/{z}/{x}/{y}.pbf`],
@@ -50,7 +58,43 @@ export default {
           }
         }
         this.map.addLayer(layer);
-      })
+      }
+
+      const loadFisherFHE = () => {
+        this.map.addSource('fisher_fhe', {
+          type: 'vector',
+          tiles: [`${TILE_SERVER_FISHER}/public.fisher_fhe/{z}/{x}/{y}.pbf`],
+          'source-layer': 'fisher_fhe',
+          'minzoom': 4,
+          'maxzoom': 22
+        })
+
+        let layer = {
+          'id': 'fisher_fhe',
+          'type': 'fill',
+          'source': 'fisher_fhe',
+          'source-layer': 'public.fisher_fhe',
+          'layout': {'visibility': 'visible'},
+          'paint': {
+            'fill-color': 'hsla(294,82%,28%,0.35)',
+            'fill-outline-color': [
+              'interpolate',
+              ['linear'],
+              ['zoom'],
+              5,
+              'hsla(308,64%,29%,0.1)',
+              10,
+              'hsl(339,100%,15%)'
+            ]
+          }
+        }
+        this.map.addLayer(layer);
+      }
+
+      loadFisherRange()
+      loadFisherFHE()
+
+
     }
   }
 }
