@@ -21,7 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(LimitUploadSize, max_upload_size=50_000_000)
+app.add_middleware(LimitUploadSize, max_upload_size=5_000_000_000)
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
