@@ -4,6 +4,7 @@
 
 <script>
 import maplibregl from 'maplibre-gl'; // or "const maplibregl = require('maplibre-gl');"
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 export default {
   name: 'Map',
@@ -18,6 +19,16 @@ export default {
         center: [-127.6476, 53.7267], // starting position [lng, lat]
         zoom: 9 // starting zoom
       });
+
+      var draw = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+          polygon: true,
+          trash: true
+        }
+      });
+
+      this.map.addControl(draw);
     }
   }
 }
