@@ -41,8 +41,8 @@ def dbexample(db: Session = Depends(get_db)):
 
     return result
 
-@router.get('/habitat')
-def habitat_in_polygon(db: Session = Depends(get_db)):
+# @router.get('/habitat')
+def habitat_in_polygon(cutblock, db):
     """ function goes here """
 
     q = """
@@ -88,12 +88,12 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
     from fisher_habitats
     """
 
-    sample_cutblock = load_cutblock('/app/fixtures/cutblocks_sample.shp')
+    # sample_cutblock = load_cutblock('/app/fixtures/cutblocks_sample.shp')
 
     result = db.execute(
         q,
         {
-            "cutblock":sample_cutblock.wkt
+            "cutblock":cutblock.wkt
         }
     )
 
@@ -102,8 +102,8 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
     return result
 
   
-@router.post("/create_file/")
-async def upload_file(shape: UploadFile = File(...)):
+@router.post("/process_file")
+async def upload_file(shape: UploadFile = File(...), db: Session = Depends(get_db)):
     print(shape.file)
     try:
         os.mkdir("shapes")
@@ -111,9 +111,23 @@ async def upload_file(shape: UploadFile = File(...)):
     except Exception as e:
         print(e) 
     file_name = os.getcwd()+"/shapes/"+shape.filename.replace(" ", "-")
+    print('filepath' + file_name)
     with open(file_name,'wb+') as f:
         f.write(shape.file.read())
         f.close()
     
     file = jsonable_encoder({"imagePath":file_name})
-    return {"filename": file_name}
+
+    this_cutblock = load_cutblock(file_name)
+    # print(this_cutblock)
+    result = habitat_in_polygon(this_cutblock, db)
+    print(result)
+    return result
+
+@router.post("/process_drawing")
+def upload_drawing(shape):
+  print(shape)
+  this_cutblock = load_cutblock(shape)
+  result = habitat_in_polygon(this_cutblock)
+
+  return result
