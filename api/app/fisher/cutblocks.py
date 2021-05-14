@@ -1,4 +1,6 @@
 import fiona
+import json
+import geojson
 from shapely.geometry import MultiPolygon, shape
 import zipfile
 
@@ -8,6 +10,8 @@ def load_cutblock(file: str):
         feature = MultiPolygon([shape(f.get('geometry')) for f in shp])
     return feature
   else:
-    with fiona.open(file) as shp:
-        feature = MultiPolygon([shape(f.get('geometry')) for f in shp])
-    return feature
+    s = json.dumps(file)
+    cut_shape = geojson.loads(s)
+    print(cut_shape)
+    feature = shape(cut_shape)
+    return feature.wkt

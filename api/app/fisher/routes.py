@@ -3,12 +3,13 @@ Map layers (layers module) API endpoints/handlers.
 """
 import random
 import logging
-from fastapi import FastAPI, HTTPException, APIRouter, BackgroundTasks, File, UploadFile, Depends
+from fastapi import FastAPI, HTTPException, APIRouter, BackgroundTasks, File, UploadFile, Depends, Request
 from sqlalchemy.orm import Session
 from app.db.utils import get_db
 from app.fisher.cutblocks import load_cutblock
 from app.config import DATABASE_URI
 from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
 import os 
 
 router = APIRouter()
@@ -147,21 +148,20 @@ async def upload_file(shape: UploadFile = File(...), db: Session = Depends(get_d
     except Exception as e:
         print(e) 
     file_name = os.getcwd()+"/shapes/"+shape.filename.replace(" ", "-")
-    print('filepath' + file_name)
     with open(file_name,'wb+') as f:
         f.write(shape.file.read())
         f.close()
     
-    file = jsonable_encoder({"imagePath":file_name})
+    # file = jsonable_encoder({"imagePath":file_name})
 
     this_cutblock = load_cutblock(file_name)
     result = habitat_in_polygon(this_cutblock, db)
     return result
 
 @router.post("/process_drawing")
-def upload_drawing(shape):
-  print(shape)
+def upload_drawing(shape: str, db: Session = Depends(get_db)):
   this_cutblock = load_cutblock(shape)
-  result = habitat_in_polygon(this_cutblock)
+  # print(this_cutblock)
+  result = habitat_in_polygon(this_cutblock, db)
 
   return result
