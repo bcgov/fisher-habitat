@@ -1,18 +1,13 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Report from './components/Report'
-import Map from './components/Map'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Map from "./components/Map";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
-
-const routes = [
-    { path: '/report', component: Report },
-    { path: '/', component:  Map }
-]
+const routes = [{ path: "/", component: Map }];
 
 const router = new VueRouter({
-    routes
-})
+  routes,
+});
 
-export default router
+export default router;
