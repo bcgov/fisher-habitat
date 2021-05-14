@@ -161,7 +161,7 @@ async def upload_file(shape: UploadFile = File(...), db: Session = Depends(get_d
 @router.post("/process_drawing")
 def upload_drawing(shape: str, db: Session = Depends(get_db)):
   this_cutblock = load_cutblock(shape)
-  # print(this_cutblock)
+  print(this_cutblock)
   result = habitat_in_polygon(this_cutblock, db)
 
   return result
