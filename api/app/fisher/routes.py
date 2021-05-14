@@ -3,12 +3,13 @@ Map layers (layers module) API endpoints/handlers.
 """
 import random
 import logging
-from fastapi import FastAPI, HTTPException, APIRouter, BackgroundTasks, File, UploadFile, Depends
+from fastapi import FastAPI, HTTPException, APIRouter, BackgroundTasks, File, UploadFile, Depends, Request
 from sqlalchemy.orm import Session
 from app.db.utils import get_db
 from app.fisher.cutblocks import load_cutblock
 from app.config import DATABASE_URI
 from fastapi.encoders import jsonable_encoder
+from pydantic import BaseModel
 import os 
 
 router = APIRouter()
@@ -41,8 +42,7 @@ def dbexample(db: Session = Depends(get_db)):
 
     return result
 
-@router.get('/habitat')
-def habitat_in_polygon(db: Session = Depends(get_db)):
+def habitat_in_polygon(cutblock, db):
     """
     returns statistics about Fisher habitat within a cutblock polygon.
     Cutblock must be in BC Albers EPSG:3005.
@@ -128,12 +128,12 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
     from fisher_habitats
     """
 
-    sample_cutblock = load_cutblock('/app/fixtures/cutblocks_sample.shp')
+    # sample_cutblock = load_cutblock('/app/fixtures/cutblocks_sample.shp')
 
     result = db.execute(
         q,
         {
-            "cutblock":sample_cutblock.wkt
+            "cutblock":cutblock.wkt
         }
     )
 
@@ -142,8 +142,8 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
     return result
 
   
-@router.post("/create_file/")
-async def upload_file(shape: UploadFile = File(...)):
+@router.post("/process_file")
+async def upload_file(shape: UploadFile = File(...), db: Session = Depends(get_db)):
     print(shape.file)
     try:
         os.mkdir("shapes")
@@ -155,5 +155,16 @@ async def upload_file(shape: UploadFile = File(...)):
         f.write(shape.file.read())
         f.close()
     
-    file = jsonable_encoder({"imagePath":file_name})
-    return {"filename": file_name}
+    # file = jsonable_encoder({"imagePath":file_name})
+
+    this_cutblock = load_cutblock(file_name)
+    result = habitat_in_polygon(this_cutblock, db)
+    return result
+
+@router.post("/process_drawing")
+def upload_drawing(shape: str, db: Session = Depends(get_db)):
+  this_cutblock = load_cutblock(shape)
+  print(this_cutblock)
+  result = habitat_in_polygon(this_cutblock, db)
+
+  return result
