@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <b-navbar toggleable="lg" type="dark" variant="info" fixed>
-      <b-navbar-brand href="#"><img id="logo" alt="BC Government" src="./assets/bc_logo.png" width="200px"></b-navbar-brand>
+      <b-navbar-brand href="#/"><img id="logo" alt="BC Government" src="./assets/bc_logo.png" width="200px"></b-navbar-brand>
       <div><a href="#/report">Report</a></div>
     </b-navbar>
     <router-view></router-view>
