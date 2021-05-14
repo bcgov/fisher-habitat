@@ -45,6 +45,7 @@ def dbexample(db: Session = Depends(get_db)):
 def habitat_in_polygon(db: Session = Depends(get_db)):
     """
     returns statistics about Fisher habitat within a cutblock polygon.
+    Cutblock must be in BC Albers EPSG:3005.
 
     The density of landscape features that Fishers rely on are retrieved
     from polygons from the `fisher_fhe` table.  The density is converted
