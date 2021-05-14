@@ -5,12 +5,11 @@
         
         <hr>
 
-        <!-- TODO: Do we get this data from the user? -->
-        <!-- <div><b>Forest License: </b>A93054</div>
-        <div><b>Cutting Permit: </b>93054</div>
-        <div><b>Analysis Date: </b>2021-05-14</div>
-        <div><b>Retention Spatial Data Version: </b>210215</div> -->
-        <!-- <br> -->
+        <div><b>Forest License: </b><b-form-input id="input-default" class="custom-input" placeholder="Enter Forest License"></b-form-input></div>
+        <div><b>Cutting Permit: </b><b-form-input id="input-default2" class="custom-input" placeholder="Enter Cutting Permit"></b-form-input></div>
+        <div><b>Analysis Date: </b>{{analysisDate || "-"}}</div>
+        <div><b>Retention Spatial Data Version: </b>{{retentionSpatialDataVersion || "-"}}</div>
+        <br>
 
         <h2>Summary Table</h2>
 
@@ -66,8 +65,10 @@ export default {
   },
   data: function() {
     return {
+      analysisDate: null,
+      retentionSpatialDataVersion: null,
       shapeArea: 0,
-      harvestImpactWarning: false,
+      harvestImpactWarning: null,
       denningPrimary: 0,
       denningContingency: 0,
       branchRestingPrimary: 0,
@@ -99,5 +100,12 @@ export default {
 <style scoped>
 #report {
   text-align: left;
+}
+.custom-input {
+  border: none !important;
+  box-shadow: none !important;
+  display: inline;
+  padding: 0;
+  max-width: 200px;
 }
 </style>
