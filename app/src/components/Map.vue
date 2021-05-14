@@ -9,7 +9,7 @@
       </div>
 
         <div class="file-up">
-          <div>upload custom shape file:</div>
+          <div>Upload Cut Block ZIP File:</div>
           <!-- Plain mode -->
           <b-form-file v-model="file" class="mt-3" plain></b-form-file>
         </div>
