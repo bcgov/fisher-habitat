@@ -87,8 +87,8 @@ export default {
       this.analysisDate = habitatInfo['create_date']
       this.retentionSpatialDataVersion = habitatInfo['version']
       this.harvestImpactWarning = habitatInfo['sum_denning_warning'] // TODO: Is this the right field?
-      this.denningContingency = habitatInfo['sum_denning_primary']
-      this.denningPrimary = habitatInfo['sum_denning_contingency']
+      this.denningContingency = habitatInfo['sum_denning_contingency'] 
+      this.denningPrimary = habitatInfo['sum_denning_primary']
       this.branchRestingPrimary = habitatInfo['sum_branch_resting_primary']
       this.branchRestingContingency = habitatInfo['sum_branch_resting_contingency']
       this.cavityRestingPrimary = habitatInfo['sum_cavity_resting_primary']

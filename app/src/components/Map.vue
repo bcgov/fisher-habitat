@@ -350,7 +350,7 @@ export default {
             }
        )
       .then(response => {
-        // TODO update report
+        this.habitatInfo = response.data
       })
     }
   }
