@@ -61,7 +61,7 @@ export default {
   mounted () {
     axios.get(`${API_BASE_URL}/api/v1/habitat`)
     .then(response => {
-      console.log('response', response)
+      this.updateReport(response.data)
     })
   },
   data: function() {
@@ -78,6 +78,18 @@ export default {
       debrisRestingPiles: 0,
       warningsYellow: [],
       warningsRed: []
+    }
+  },
+  methods: {
+    updateReport (habitatInfo) {
+      this.harvestImpactWarning = habitatInfo['sum_denning_warning'] // TODO: Is this the right field?
+      this.denningContingency = habitatInfo['sum_denning_primary']
+      this.denningPrimary = habitatInfo['sum_denning_contingency']
+      this.branchRestingPrimary = habitatInfo['sum_branch_resting_primary']
+      this.branchRestingContingency = habitatInfo['sum_branch_resting_contingency']
+      this.cavityRestingPrimary = habitatInfo['sum_cavity_resting_primary']
+      this.debrisRestingPieces = habitatInfo['sum_resting_piece']
+      this.debrisRestingPiles = habitatInfo['sum_resting_piles']
     }
   }
 }
