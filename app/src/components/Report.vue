@@ -59,7 +59,7 @@ import {API_BASE_URL} from '../consts'
 export default {
   name: "Report",
   mounted () {
-    axios.get(`${API_BASE_URL}/api/v1/habitat`)
+    axios.get(`${API_BASE_URL}/v1/habitat`)
     .then(response => {
       this.updateReport(response.data)
     })
