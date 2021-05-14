@@ -5,7 +5,7 @@
       <Report></Report>
 
       <div class="save-button">
-        <button type="button" class="btn btn-primary" v-on:click="savePollygons">Generate Report</button>
+        <button type="button" class="btn btn-primary" v-on:click="generateReport">Generate Report</button>
       </div>
 
         <div class="file-up">
@@ -27,6 +27,8 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 import { TILE_SERVER_FISHER } from "../consts"
 import Report from "./Report";
+import axios from 'axios';
+import {API_BASE_URL} from '../consts'
 
 export default {
   name: 'Map',
@@ -187,9 +189,6 @@ export default {
 
       this.map.addControl(this.draw);
 
-      this.map.on('draw.delete', this.updateReport());
-      this.map.on('draw.update', this.updateReport());
-
       this.map.on('load', () => {
         this.loadLayers()
       })
@@ -202,9 +201,14 @@ export default {
       })
     },
 
-    updateReport: function () {
+    generateReport: function () {
       console.log('update report:');
       console.log(this.draw.getAll());
+      
+      axios.post(`${API_BASE_URL}/v1/process_drawing`,  { shape: JSON.stringify(this.draw.getAll())})
+      .then(response => {
+        Report.updateReport(response.data)
+      })
     },
 
     loadLayers: function () {
