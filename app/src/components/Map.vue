@@ -179,16 +179,16 @@ export default {
 
       this.map.addControl(this.draw);
 
-      this.map.on('draw.create', this.updateArea());
-      this.map.on('draw.delete', this.updateArea());
-      this.map.on('draw.update', this.updateArea());
+      this.map.on('draw.create', this.updateReport());
+      this.map.on('draw.delete', this.updateReport());
+      this.map.on('draw.update', this.updateReport());
 
       this.map.on('load', () => {
         this.loadLayers()
       })
     },
 
-    updateArea: function () {
+    updateReport: function () {
       console.log('update report:');
       console.log(this.draw.getAll());
     },
