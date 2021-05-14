@@ -5,6 +5,7 @@
         
         <hr>
 
+        <!-- TODO: Do we get this data from the user? -->
         <div><b>Forest License: </b>A93054</div>
         <div><b>Cutting Permit: </b>93054</div>
         <div><b>Analysis Date: </b>2021-05-14</div>
