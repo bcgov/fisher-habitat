@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from starlette.requests import Request
 from starlette.middleware.cors import CORSMiddleware
 from app.db.session import Session as DBSession
-
+from app.middleware.limit_upload_size import LimitUploadSize
 from app.fisher.routes import router
 
 app = FastAPI(title="Fisher Habitat")
@@ -21,7 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.add_middleware(LimitUploadSize, max_upload_size=50_000_000)
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
