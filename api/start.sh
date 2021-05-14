@@ -14,7 +14,7 @@ fi
 export GUNICORN_CONF=${GUNICORN_CONF:-$DEFAULT_GUNICORN_CONF}
 
 # Let the DB start
-python /app/api/db/wait_for_db.py
+python /app/app/db/wait_for_db.py
 
 echo "$GUNICORN_CONF" "$APP_MODULE"
 
