@@ -75,22 +75,23 @@ def habitat_in_polygon(cutblock, db):
                 coalesce(cavity_res, 0) as cavity_res,
                 coalesce(cavity_r_1, 0) as cavity_r_1,
                 coalesce(cwd_restin, 0) as cwd_restin,
-                coalesce(cwd_rest_1, 0) as cwd_rest_1
+                coalesce(cwd_rest_1, 0) as cwd_rest_1,
+                version::numeric
         from    fisher_fhe f
         inner join cutblock c on ST_Intersects(ST_Transform(c.geom, 4326), f.geom)
     )
     select
         sum(denning_wa) as sum_denning_warning,
         ROUND(sum(denning_pr * area_ha)) as sum_denning_primary,
-        ROUND(sum(denning_pr * area_ha * 4)) as sum_denning_contingency,
+        ROUND(sum(denning_pr * area_ha) * 4) as sum_denning_contingency,
         ROUND(sum((denning_pr * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as denning_primary_density_cutblock,
         sum(branch_res) as sum_branch_resting_warning,
         ROUND(sum(branch_r_1  * area_ha)) as sum_branch_resting_primary,
-        ROUND(sum(branch_r_1  * area_ha * 4)) as sum_branch_resting_contingency,
+        ROUND(sum(branch_r_1  * area_ha) * 4) as sum_branch_resting_contingency,
         ROUND(sum((branch_r_1  * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as branch_resting_primary_density_cutblock,
         sum(cavity_res) as sum_cavity_resting_warning,
         ROUND(sum(cavity_r_1 * area_ha)) as sum_cavity_resting_primary,
-        ROUND(sum(cavity_r_1 * area_ha)) as sum_cavity_resting_primary,
+        ROUND(sum(cavity_r_1 * area_ha) * 4) as sum_cavity_resting_contingency,
         ROUND(sum((cavity_r_1 * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as cavity_resting_primary_density_cutblock,
         ROUND(sum(cwd_restin * area_ha)) as sum_resting_piece,
         ROUND(sum(cwd_rest_1 * area_ha)) as sum_resting_piles,
@@ -121,7 +122,9 @@ def habitat_in_polygon(cutblock, db):
                         geom
                 from fisher_habitats where harvest_im ilike 'WARNING: Harvest of this exceptionally rare%'
             ) t
-        ) as red_polygons
+        ) as red_polygons,
+        NOW() as create_date,
+        MIN(version) as version
     from fisher_habitats
     """
 
