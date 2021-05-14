@@ -37,14 +37,14 @@ export default {
 
       // Define bounds that conform to the `LngLatBoundsLike` object.
       var bounds = [
-        [-141.06, 46.30], // [west, south]
-        [-116.03, 62.00]  // [east, north]
+        [-139.06, 48.30], // [west, south]
+        [-114.03, 60.00]  // [east, north]
       ];
 
       // Set the map's max bounds.
       this.map.setMaxBounds(bounds);
 
-      var draw = new MapboxDraw({
+      this.draw = new MapboxDraw({
         displayControlsDefault: false,
         controls: {
           polygon: true,
