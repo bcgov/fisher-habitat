@@ -36,16 +36,15 @@ export default {
           'source-layer': 'public.fisher_range',
           'layout': {'visibility': 'visible'},
           'paint': {
-            'fill-color': 'hsla(220,82%,28%,0.69)',
-            // 'fill-outline-color': 'hsla(219,100%,15%,0.84)'
+            'fill-color': 'hsla(220,82%,28%,0.35)',
             'fill-outline-color': [
               'interpolate',
               ['linear'],
               ['zoom'],
               5,
-              'hsla(0, 0%, 55%, 0)',
+              'hsla(219,100%,15%,0.1)',
               10,
-              'hsl(0, 0%, 19%)'
+              'hsl(219,100%,15%)'
             ]
           }
         }
