@@ -43,7 +43,19 @@ def dbexample(db: Session = Depends(get_db)):
 
 @router.get('/habitat')
 def habitat_in_polygon(db: Session = Depends(get_db)):
-    """ function goes here """
+    """
+    returns statistics about Fisher habitat within a cutblock polygon.
+
+    The density of landscape features that Fishers rely on are retrieved
+    from polygons from the `fisher_fhe` table.  The density is converted
+    to a count by multiplying by the intersecting area of every fisher_fhe
+    polygon and the cutblock polygon.
+
+    Polygons with different types of warnings are also returned as `yellow_polygons`
+    and `red_polygons`.
+
+    Fields that contain "density" are in units/hectare (hectare = 10000 sq m).
+    """
 
     q = """
     with cutblock as (
