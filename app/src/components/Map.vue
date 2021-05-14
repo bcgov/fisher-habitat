@@ -163,7 +163,7 @@ export default {
         ],
       });
 
-      this.map.addControl(draw);
+      this.map.addControl(this.draw);
       this.map.on('load', () => {
         this.loadLayers()
       })
