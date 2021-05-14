@@ -216,6 +216,39 @@ export default {
       })
     },
 
+    addLayer (id, geojson) {
+      this.map.addSource(id, geojson);
+        
+        // Add a new layer to visualize the polygon.
+      this.map.addLayer({
+        'id': id,
+        'type': 'fill',
+        'source': id, // reference the data source
+        'layout': {},
+        'paint': {
+        'fill-color': '#0080ff', // blue color fill
+        'fill-opacity': 0.5
+        }
+      });
+        // Add a black outline around the polygon.
+      this.map.addLayer({
+        'id': `${id}outline`,
+        'type': 'line',
+        'source': id,
+        'layout': {},
+        'paint': {
+          'line-color': '#000',
+          'line-width': 3
+        }
+      });
+    },
+
+    removeLayer (id) {
+      this.map.removeLayer(id)
+      this.map.removeLayer(id)
+      this.map.removeSource()
+    },
+
     loadLayers: function () {
       // Load Fisher Range layer
       const loadFisherRange = () => {
