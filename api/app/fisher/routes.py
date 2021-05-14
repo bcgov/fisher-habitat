@@ -48,41 +48,65 @@ def habitat_in_polygon(db: Session = Depends(get_db)):
         select ST_SetSRID(ST_GeomFromText(:cutblock), 3005) as geom
     ),
     fisher_habitats as (
-        select  ST_Transform(ST_Intersection(ST_Transform(geom, 3005), (select geom from cutblock)), 4326) as geom,
+        select  ogc_fid as id,
+                ST_Transform(ST_Intersection(ST_Transform(f.geom, 3005), c.geom), 4326) as geom,
+                ST_Area(ST_Intersection(ST_Transform(f.geom, 3005), c.geom)) / 10000 as area_ha,
                 fisher_hab,
                 harvest_im,
-                denning_wa,
-                denning_pr * (ST_Area(ST_Intersection(ST_Transform(geom, 3005), (select geom from cutblock))) / 10000) as denning_pr,
-                branch_res,
-                branch_r_1 * (ST_Area(ST_Intersection(ST_Transform(geom, 3005), (select geom from cutblock))) / 10000) as branch_r_1,
-                cavity_res,
-                cavity_r_1 * (ST_Area(ST_Intersection(ST_Transform(geom, 3005), (select geom from cutblock))) / 10000) as cavity_r_1,
-                cwd_restin * (ST_Area(ST_Intersection(ST_Transform(geom, 3005), (select geom from cutblock))) / 10000) as cwd_restin,
-                cwd_rest_1 * (ST_Area(ST_Intersection(ST_Transform(geom, 3005), (select geom from cutblock))) / 10000) as cwd_rest_1
-        from    fisher_fhe
-        where   ST_Intersects(
-                    geom,
-                    ST_Transform(
-                        ST_SetSRID(ST_GeomFromText(:cutblock), 3005),
-                        4326
-                    )
-        )
+                coalesce(denning_wa, 0) as denning_wa,
+                coalesce(denning_pr, 0) as denning_pr,
+                coalesce(branch_res, 0) as branch_res,
+                coalesce(branch_r_1, 0) as branch_r_1,
+                coalesce(cavity_res, 0) as cavity_res,
+                coalesce(cavity_r_1, 0) as cavity_r_1,
+                coalesce(cwd_restin, 0) as cwd_restin,
+                coalesce(cwd_rest_1, 0) as cwd_rest_1
+        from    fisher_fhe f
+        inner join cutblock c on ST_Intersects(ST_Transform(c.geom, 4326), f.geom)
     )
     select
         sum(denning_wa) as sum_denning_warning,
-        sum(denning_pr) as sum_denning_primary,
-        sum(denning_pr) / (select ST_Area(geom)/10000 from cutblock) as denning_primary_density,
+        ROUND(sum(denning_pr * area_ha)) as sum_denning_primary,
+        ROUND(sum(denning_pr * area_ha * 4)) as sum_denning_contingency,
+        ROUND(sum((denning_pr * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as denning_primary_density_cutblock,
         sum(branch_res) as sum_branch_resting_warning,
-        sum(branch_r_1) as sum_branch_resting_primary,
+        ROUND(sum(branch_r_1  * area_ha)) as sum_branch_resting_primary,
+        ROUND(sum(branch_r_1  * area_ha * 4)) as sum_branch_resting_contingency,
+        ROUND(sum((branch_r_1  * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as branch_resting_primary_density_cutblock,
         sum(cavity_res) as sum_cavity_resting_warning,
-        sum(cavity_r_1) as sum_cavity_resting_primary,
-        sum(cwd_restin) as sum_resting_piece,
-        sum(cwd_rest_1) as sum_resting_piles,
+        ROUND(sum(cavity_r_1 * area_ha)) as sum_cavity_resting_primary,
+        ROUND(sum(cavity_r_1 * area_ha)) as sum_cavity_resting_primary,
+        ROUND(sum((cavity_r_1 * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as cavity_resting_primary_density_cutblock,
+        ROUND(sum(cwd_restin * area_ha)) as sum_resting_piece,
+        ROUND(sum(cwd_rest_1 * area_ha)) as sum_resting_piles,
+        ROUND(sum((cwd_restin * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as resting_piece_density_cutblock,
+        ROUND(sum((cwd_rest_1 * area_ha) / (select ST_Area(geom)/10000 from cutblock))::numeric, 1) as resting_piles_density_cutblock,
         (select count(*) from fisher_habitats where harvest_im ilike 'warning%') as warning_count,
         (select count(*) from fisher_habitats where harvest_im ilike 'caution%') as caution_count,
-        (select ST_AsGeoJSON(ST_CollectionExtract(ST_Collect(geom), 3)) from fisher_habitats where harvest_im ilike 'warning%') as warning_geom,
-        (select ST_AsGeoJSON(ST_CollectionExtract(ST_Collect(geom), 3)) from fisher_habitats where harvest_im ilike 'caution%') as caution_geom,
-        (select sum(denning_pr) from fisher_habitats where harvest_im ilike 'warning%') as warning_denning_sum
+        (select json_build_object(
+            'type', 'FeatureCollection',
+            'features', coalesce(json_agg(ST_AsGeoJSON(t.*)::json), '[]'::json)
+            )
+            from (
+                select  id,
+                        fisher_hab,
+                        harvest_im,
+                        geom
+                from fisher_habitats where harvest_im ilike 'WARNING: Any harvest of this rare%'
+            ) t
+        ) as yellow_polygons,
+        (select json_build_object(
+            'type', 'FeatureCollection',
+            'features', coalesce(json_agg(ST_AsGeoJSON(t.*)::json), '[]'::json)
+            )
+            from (
+                select  id,
+                        fisher_hab,
+                        harvest_im,
+                        geom
+                from fisher_habitats where harvest_im ilike 'WARNING: Harvest of this exceptionally rare%'
+            ) t
+        ) as red_polygons
     from fisher_habitats
     """
 
