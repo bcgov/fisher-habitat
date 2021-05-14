@@ -35,6 +35,15 @@ export default {
         zoom: 4.7 // starting zoom
       });
 
+      // Define bounds that conform to the `LngLatBoundsLike` object.
+      var bounds = [
+        [-140.06, 47.30], // [west, south]
+        [-113.03, 61.00]  // [east, north]
+      ];
+
+      // Set the map's max bounds.
+      this.map.setMaxBounds(bounds);
+
       this.draw = new MapboxDraw({
         displayControlsDefault: false,
         controls: {
