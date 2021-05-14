@@ -60,8 +60,17 @@
 </template>
 
 <script>
+import axios from 'axios';
+
+import {API_BASE_URL} from '../consts'
 export default {
   name: "Report",
+  mounted () {
+    axios.get(`${API_BASE_URL}/api/v1/habitat`)
+    .then(response => {
+      console.log('response', response)
+    })
+  },
   data: function() {
     return {
       shapeArea: 244.4,

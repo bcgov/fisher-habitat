@@ -17,9 +17,9 @@
 import maplibregl from 'maplibre-gl'; // or "const maplibregl = require('maplibre-gl');"
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
+import { TILE_SERVER_FISHER } from "../consts"
 import Report from "./Report";
 
-const TILE_SERVER_FISHER = 'http://localhost:7800/'
 export default {
   name: 'Map',
   components: {Report},
