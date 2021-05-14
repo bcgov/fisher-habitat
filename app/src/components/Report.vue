@@ -22,25 +22,33 @@
         <br>
 
         <div><b>Denning Habitat</b></div>
-        <div><b>Acb >52 cm dbh or At >40 cm dbh: </b>{{denningPrimary}}</div>
-        <div><b>Contigency: next-largest diameter Acb or At: </b>{{denningContingency}}</div> 
+        <!-- <div><b>Acb >52 cm dbh or At >40 cm dbh: </b>{{denningPrimary}}</div>
+        <div><b>Contigency: next-largest diameter Acb or At: </b>{{denningContingency}}</div>  -->
+        <div><b>Primary: </b>{{denningPrimary}}</div>
+        <div><b>Contigency: </b>{{denningContingency}}</div> 
         <br>
 
         <div><b>Branch Resting Habitat</b></div>
-        <div><b>Sw >31 cm dbh or Sb >17 cm dbh with rust brooms: </b>{{branchRestingPrimary}}</div>
-        <div><b>Contigency: next-largest diameter Sw or any Sw with rust broom infection: </b>{{branchRestingContingency}}</div>
+        <!-- <div><b>Sw >31 cm dbh or Sb >17 cm dbh with rust brooms: </b>{{branchRestingPrimary}}</div>
+        <div><b>Contigency: next-largest diameter Sw or any Sw with rust broom infection: </b>{{branchRestingContingency}}</div> -->
+        <div><b>Primary: </b>{{branchRestingPrimary}}</div>
+        <div><b>Contigency: </b>{{branchRestingContingency}}</div>
         <br>
 
         <div><b>Cavity Resting Habitat</b></div>
         <!-- TODO: If values are 0, render: <div>No retention needed for this habitat feature.</div> -->
+        <div><b>Primary: </b>{{cavityRestingPrimary}}</div>
+        <div><b>Contigency: </b>{{cavityRestingContingency}}</div>        
         <!-- TODO: What is the correct text here? -->
-        <div><b>???: </b>{{cavityRestingPrimary}}</div>
-        <div><b>Contigency: ???: </b>{{cavityRestingContingency}}</div>
+        <!-- <div><b>???: </b>{{cavityRestingPrimary}}</div>
+        <div><b>Contigency: ???: </b>{{cavityRestingContingency}}</div> -->
         <br>
 
         <div><b>Coarse Woody Debris Resting Habitat</b></div>
-        <div><b>Retention: </b><small>hard logs >35 cm diameter, >7 m in length, and elevated 25-50 cm above ground. If trees >35 cm do not occur in the harvest area (i.e., in cruise data), 2 or more smaller trees totalling >35 cm diameter may be placed alongside each other and elevated 25-50 cm above ground.</small> <b>{{debrisRestingPieces}}</b></div>
-        <div><b>Creation: </b><small>piles that are at least 3m x 5m and 2m high built with logs >10 cm diam. (no tops or fines), jumbled like pick-up sticks, with 1/3 of logs >20 cm diam. and >3 m long</small> <b>{{debrisRestingPiles}}</b></div>
+        <div><b>Retention: </b>{{debrisRestingPieces}}</div>
+        <div><b>Creation: </b>{{debrisRestingPiles}}</div>
+        <!-- <div><b>Retention: </b><small>hard logs >35 cm diameter, >7 m in length, and elevated 25-50 cm above ground. If trees >35 cm do not occur in the harvest area (i.e., in cruise data), 2 or more smaller trees totalling >35 cm diameter may be placed alongside each other and elevated 25-50 cm above ground.</small> <b>{{debrisRestingPieces}}</b></div>
+        <div><b>Creation: </b><small>piles that are at least 3m x 5m and 2m high built with logs >10 cm diam. (no tops or fines), jumbled like pick-up sticks, with 1/3 of logs >20 cm diam. and >3 m long</small> <b>{{debrisRestingPiles}}</b></div> -->
         <br>
 
         <!-- TODO: How to render each warning/caution area? -->
