@@ -1,14 +1,11 @@
 <template>
   <div>
     <div id='map'></div>
-    <div class="control-box">
-      <p>Draw a polygon using the draw tools. &#128513; &#128073; &#128073;</p>
-      <div class="save-button">
-        <button type="button" class="btn btn-primary" v-on:click="savePollygons">Save All Pollygons</button>
-      </div>
-    </div>
     <div class="report">
       <Report></Report>
+      <div class="save-button">
+        <button type="button" class="btn btn-primary" v-on:click="savePollygons">Generate Report</button>
+      </div>
     </div>
   </div>
 </template>
@@ -301,7 +298,6 @@ export default {
 <style scoped>
   .save-button {
     text-align: left;
-    padding: 20px;
   }
   .control-box {
     height: 125px;
