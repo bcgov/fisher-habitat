@@ -21,24 +21,24 @@
 
         <div><b>Denning Habitat</b></div>
         <!-- <div><b>Acb >52 cm dbh or At >40 cm dbh: </b>{{denningPrimary}}</div>
-        <div><b>Contigency: next-largest diameter Acb or At: </b>{{denningContingency}}</div>  -->
+        <div><b>Contingency: next-largest diameter Acb or At: </b>{{denningContingency}}</div>  -->
         <div><b>Primary: </b>{{denningPrimary}}</div>
-        <div><b>Contigency: </b>{{denningContingency}}</div> 
+        <div><b>Contingency: </b>{{denningContingency}}</div> 
         <br>
 
         <div><b>Branch Resting Habitat</b></div>
         <!-- <div><b>Sw >31 cm dbh or Sb >17 cm dbh with rust brooms: </b>{{branchRestingPrimary}}</div>
-        <div><b>Contigency: next-largest diameter Sw or any Sw with rust broom infection: </b>{{branchRestingContingency}}</div> -->
+        <div><b>Contingency: next-largest diameter Sw or any Sw with rust broom infection: </b>{{branchRestingContingency}}</div> -->
         <div><b>Primary: </b>{{branchRestingPrimary}}</div>
-        <div><b>Contigency: </b>{{branchRestingContingency}}</div>
+        <div><b>Contingency: </b>{{branchRestingContingency}}</div>
         <br>
 
         <div><b>Cavity Resting Habitat</b></div>
         <div><b>Primary: </b>{{cavityRestingPrimary}}</div>
-        <div><b>Contigency: </b>{{cavityRestingContingency}}</div>        
+        <div><b>Contingency: </b>{{cavityRestingContingency}}</div>        
         <!-- TODO: What is the correct text here? -->
         <!-- <div><b>???: </b>{{cavityRestingPrimary}}</div>
-        <div><b>Contigency: ???: </b>{{cavityRestingContingency}}</div> -->
+        <div><b>Contingency: ???: </b>{{cavityRestingContingency}}</div> -->
         <br>
 
         <div><b>Coarse Woody Debris Resting Habitat</b></div>
