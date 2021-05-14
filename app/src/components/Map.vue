@@ -301,7 +301,19 @@ export default {
     },
 
     uploadFile: function () {
-      console.log(this.file);
+    let formData = new FormData();
+    formData.append('shape', this.file);
+    axios.post(`${API_BASE_URL}/v1/process_file`, 
+      formData,
+             {
+              headers: {
+                  'Content-Type': 'multipart/form-data'
+              }
+            }
+       )
+      .then(response => {
+        // TODO update report
+      })
     }
   }
 }
