@@ -23,20 +23,3 @@ def load_cutblock_file(file: bytes):
     with fiona.BytesCollection(file) as shp:
         feature = MultiPolygon([shape(f.get('geometry')) for f in shp])
     return feature
-
-
-"""
-insert into fisher_poly(harvest_im, geom)
-SELECT harvest_im,
-       ST_Multi(ST_Union(ST_MakeValid(geom))) AS geom
-FROM   (
-  SELECT harvest_im,
-         geom,
-         ST_ClusterDBSCAN(geom, .01, 1) OVER(PARTITION BY harvest_im) AS _clst
-  FROM   fisher_fhe
-) q
-WHERE  _clst IS NOT NULL
-GROUP BY
-       harvest_im, _clst
-;
-"""
