@@ -15,7 +15,7 @@
         </div>
 
         <div class="save-button">
-          <button type="button" class="btn btn-primary" v-on:click="uploadFile">Upload File</button>
+          <button :disabled="!file" type="button" class="btn btn-primary" v-on:click="uploadFile">Upload File</button>
         </div>
     </div>
   </div>
@@ -38,7 +38,9 @@ export default {
   },
   data () {
     return {
-      habitatInfo: null
+      habitatInfo: null,
+      file: null,
+      activeLayers: []
     }
   },
   methods: {
@@ -194,11 +196,30 @@ export default {
 
       this.map.addControl(this.draw);
 
+      const resetOnDrawUpdate = () => {
+        this.resetShapes()
+        this.habitatInfo = null
+      }
+
+      this.map.on('draw.delete', resetOnDrawUpdate)
+      this.map.on('draw.create', resetOnDrawUpdate)
+      this.map.on('draw.update', resetOnDrawUpdate)
+
       this.map.on('load', () => {
         this.loadLayers()
       })
 
       this.map.on('click', 'fisher_range', (e) => {
+        let f = this.map.queryRenderedFeatures(e.point, { layers: this.activeLayers })
+        if (f.length) {
+          return
+        }
+        
+        console.log(this.draw.getMode())
+        if (this.draw.getMode() === 'draw_polygon') {
+          return
+        }
+
         new maplibregl.Popup()
         .setLngLat(e.lngLat)
         .setHTML(this.popupHTML(e))
@@ -208,17 +229,42 @@ export default {
 
     generateReport: function () {
       console.log('update report:');
+      this.resetShapes()
       console.log(this.draw.getAll());
       
       axios.post(`${API_BASE_URL}/v1/process_drawing`,  { shape: JSON.stringify(this.draw.getAll())})
       .then(response => {
         this.habitatInfo = response.data
+        this.addLayer('yellow-warnings', response.data.yellow_polygons, '#e1ad01', true)
+        this.addLayer('red-warnings', response.data.red_polygons, 'red', true)
       })
     },
 
-    addLayer (id, geojson) {
-      this.map.addSource(id, geojson);
+    harvestImpactPopup (e) {
+        var coordinates = e.lngLat
+        var description = e.features[0].properties.harvest_im
         
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+        }
+        
+        new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(description)
+        .addTo(this.map)
+    },
+    harvestImpactHoverOn () {
+      this.map.getCanvas().style.cursor = 'pointer'
+    },
+    harvestImpactHoverOff () {
+      this.map.getCanvas().style.cursor = ''
+    },
+    addLayer (id, geojson, color="#0080ff", createPopup=false) {
+      this.map.addSource(id, {
+          type: 'geojson',
+          data: geojson
+        })
+
         // Add a new layer to visualize the polygon.
       this.map.addLayer({
         'id': id,
@@ -226,10 +272,10 @@ export default {
         'source': id, // reference the data source
         'layout': {},
         'paint': {
-        'fill-color': '#0080ff', // blue color fill
+        'fill-color': color, // blue color fill
         'fill-opacity': 0.5
         }
-      });
+      })
         // Add a black outline around the polygon.
       this.map.addLayer({
         'id': `${id}outline`,
@@ -238,15 +284,35 @@ export default {
         'layout': {},
         'paint': {
           'line-color': '#000',
-          'line-width': 3
+          'line-width': 1
         }
-      });
+      })
+
+      this.activeLayers.push(id)
+
+      if (createPopup) {
+
+        this.map.on('click', id, this.harvestImpactPopup)
+        
+        // Change the cursor to a pointer when the mouse is over the places layer.
+        this.map.on('mouseenter', id, () => this.harvestImpactHoverOn);
+        
+        // Change it back to a pointer when it leaves.
+        this.map.on('mouseleave', id, () => this.harvestImpactHoverOff);
+      }
+
     },
 
     removeLayer (id) {
       this.map.removeLayer(id)
-      this.map.removeLayer(id)
-      this.map.removeSource()
+      this.map.removeLayer(`${id}outline`)
+      this.map.removeSource(id)
+      if (['yellow-warnings', 'red-warnings'].includes(id)) {
+        this.map.off('click', id, this.harvestImpactPopup)
+        this.map.off('mouseenter', id, this.harvestImpactHoverOn)
+        this.map.off('mouseleave', id, this.harvestImpactHoverOff)
+      }
+
     },
 
     loadLayers: function () {
@@ -267,7 +333,7 @@ export default {
           'source-layer': 'public.fisher_range',
           'layout': {'visibility': 'visible'},
           'paint': {
-            'fill-color': 'hsla(220,82%,28%,0.35)',
+            'fill-color': 'hsla(220,82%,28%,0.15)',
             'fill-outline-color': [
               'interpolate',
               ['linear'],
@@ -298,7 +364,7 @@ export default {
           'source-layer': 'public.fisher_fhe',
           'layout': {'visibility': 'visible'},
           'paint': {
-            'fill-color': 'hsla(294,82%,28%,0.35)',
+            'fill-color': 'hsla(294,82%,28%,0.10)',
             'fill-outline-color': [
               'interpolate',
               ['linear'],
@@ -340,6 +406,7 @@ export default {
 
     uploadFile: function () {
     let formData = new FormData();
+    this.resetShapes()
     formData.append('shape', this.file);
     axios.post(`${API_BASE_URL}/v1/process_file`, 
       formData,
@@ -350,8 +417,30 @@ export default {
             }
        )
       .then(response => {
-        // TODO update report
+        this.habitatInfo = response.data
+        this.addLayer('yellow-warnings', response.data.yellow_polygons, '#e1ad01', true)
+        this.addLayer('red-warnings', response.data.red_polygons, 'red', true)
       })
+    },
+    resetShapes() {
+        let mapLayer = this.map.getLayer('cutblock')
+        if(typeof mapLayer !== 'undefined') {
+          // Remove map layer & source.
+          this.removeLayer('cutblock')
+        }
+
+        mapLayer = this.map.getLayer('yellow-warnings')
+        if(typeof mapLayer !== 'undefined') {
+          // Remove map layer & source.
+          this.removeLayer('yellow-warnings')
+        }
+
+        mapLayer = this.map.getLayer('red-warnings')
+        if(typeof mapLayer !== 'undefined') {
+          // Remove map layer & source.
+          this.removeLayer('red-warnings')
+        }
+        this.activeLayers = []
     }
   }
 }

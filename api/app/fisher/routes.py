@@ -2,45 +2,20 @@
 Map layers (layers module) API endpoints/handlers.
 """
 import random
+import pyproj
 import logging
 from fastapi import FastAPI, HTTPException, APIRouter, BackgroundTasks, File, UploadFile, Depends, Request
 from sqlalchemy.orm import Session
 from app.db.utils import get_db
-from app.fisher.cutblocks import load_cutblock
+from app.fisher.cutblocks import load_cutblock, load_cutblock_file
 from app.config import DATABASE_URI
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-import os 
+from shapely.ops import transform
+from shapely.geometry import mapping
 
 router = APIRouter()
 logger = logging.getLogger('api')
-
-def bgtask():
-    time.sleep(1)
-
-@router.get('/hello/{hi}')
-def hello_world(hi: str):
-    """ function goes here """
-    return hi
-
-@router.get('/background')
-def background(background_tasks: BackgroundTasks):
-    background_tasks.add_task(bgtask)
-    return {"message": "added background task"}
-
-
-@router.get('/dbexample')
-def dbexample(db: Session = Depends(get_db)):
-    """ function goes here """
-
-    q = """
-    select 42
-    """
-
-    result = db.execute(q)
-    result = result.fetchone()[0]
-
-    return result
 
 def habitat_in_polygon(cutblock, db):
     """
@@ -128,8 +103,6 @@ def habitat_in_polygon(cutblock, db):
     from fisher_habitats
     """
 
-    # sample_cutblock = load_cutblock('/app/fixtures/cutblocks_sample.shp')
-
     result = db.execute(
         q,
         {
@@ -143,22 +116,16 @@ def habitat_in_polygon(cutblock, db):
 
   
 @router.post("/process_file")
-async def upload_file(shape: UploadFile = File(...), db: Session = Depends(get_db)):
-    print(shape.file)
-    try:
-        os.mkdir("shapes")
-        print(os.getcwd())
-    except Exception as e:
-        print(e) 
-    file_name = os.getcwd()+"/shapes/"+shape.filename.replace(" ", "-")
-    with open(file_name,'wb+') as f:
-        f.write(shape.file.read())
-        f.close()
-    
-    # file = jsonable_encoder({"imagePath":file_name})
+async def upload_file(shape: bytes = File(...), db: Session = Depends(get_db)):
 
-    this_cutblock = load_cutblock(file_name)
+    this_cutblock = load_cutblock_file(shape)
     result = habitat_in_polygon(this_cutblock, db)
+    wgs84 = pyproj.CRS('EPSG:4326')
+    bcalbers = pyproj.CRS('EPSG:3005')
+
+    project = pyproj.Transformer.from_crs(bcalbers, wgs84, always_xy=True).transform
+    feat = mapping(transform(project, this_cutblock))
+    result['cutblock'] = feat
     return result
 
 

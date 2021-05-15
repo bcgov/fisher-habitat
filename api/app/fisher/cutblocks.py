@@ -6,13 +6,8 @@ from shapely.ops import transform
 import pyproj
 import zipfile
 
-def load_cutblock(file: str):
-  if zipfile.is_zipfile(file):
-    with fiona.open('zip://' + file) as shp:
-        feature = MultiPolygon([shape(f.get('geometry')) for f in shp])
-    return feature
-  else:
-    feature_collection = geojson.loads(file)
+def load_cutblock(fc: str):
+    feature_collection = geojson.loads(fc)
     poly = MultiPolygon([shape(p.geometry) for p in feature_collection.features ])
 
     wgs84 = pyproj.CRS('EPSG:4326')
@@ -22,3 +17,26 @@ def load_cutblock(file: str):
     feature = transform(project, poly)
 
     return feature
+
+
+def load_cutblock_file(file: bytes):
+    with fiona.BytesCollection(file) as shp:
+        feature = MultiPolygon([shape(f.get('geometry')) for f in shp])
+    return feature
+
+
+"""
+insert into fisher_poly(harvest_im, geom)
+SELECT harvest_im,
+       ST_Multi(ST_Union(ST_MakeValid(geom))) AS geom
+FROM   (
+  SELECT harvest_im,
+         geom,
+         ST_ClusterDBSCAN(geom, .01, 1) OVER(PARTITION BY harvest_im) AS _clst
+  FROM   fisher_fhe
+) q
+WHERE  _clst IS NOT NULL
+GROUP BY
+       harvest_im, _clst
+;
+"""

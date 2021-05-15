@@ -52,18 +52,9 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-import {API_BASE_URL} from '../consts'
 export default {
   name: "Report",
   props: ['habitatInfo'],
-  mounted () {
-    axios.get(`${API_BASE_URL}/v1/habitat`)
-    .then(response => {
-      this.updateReport(response.data)
-    })
-  },
   data: function() {
     return {
       analysisDate: null,
@@ -87,8 +78,8 @@ export default {
       this.analysisDate = habitatInfo['create_date']
       this.retentionSpatialDataVersion = habitatInfo['version']
       this.harvestImpactWarning = habitatInfo['sum_denning_warning'] // TODO: Is this the right field?
-      this.denningContingency = habitatInfo['sum_denning_primary']
-      this.denningPrimary = habitatInfo['sum_denning_contingency']
+      this.denningContingency = habitatInfo['sum_denning_contingency'] 
+      this.denningPrimary = habitatInfo['sum_denning_primary']
       this.branchRestingPrimary = habitatInfo['sum_branch_resting_primary']
       this.branchRestingContingency = habitatInfo['sum_branch_resting_contingency']
       this.cavityRestingPrimary = habitatInfo['sum_cavity_resting_primary']
@@ -102,6 +93,20 @@ export default {
       handler: function (v) {
         if (v) {
           this.updateReport(v)
+        }
+        else {
+          this.analysisDate = null
+          this.retentionSpatialDataVersion = null
+          this.shapeArea = 0
+          this.harvestImpactWarning = null
+          this.denningPrimary = 0
+          this.denningContingency = 0
+          this.branchRestingPrimary = 0
+          this.branchRestingContingency = 0
+          this.cavityRestingPrimary = 0
+          this.cavityRestingContingency = 0
+          this.debrisRestingPieces = 0
+          this.debrisRestingPiles = 0
         }
       }
     }
