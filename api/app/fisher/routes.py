@@ -124,7 +124,9 @@ def habitat_in_polygon(cutblock, db):
             ) t
         ) as red_polygons,
         NOW() as create_date,
-        MIN(version) as version
+        MIN(version) as version,
+        ST_AsGeoJSON(:cutblock)::json as cutblock
+
     from fisher_habitats
     """
 

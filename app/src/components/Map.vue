@@ -212,44 +212,67 @@ export default {
       
       axios.post(`${API_BASE_URL}/v1/process_drawing`,  { shape: JSON.stringify(this.draw.getAll())})
       .then(response => {
+        this.updateCutBlockLayer(response.data.cutblock);
         this.habitatInfo = response.data
       })
     },
-
-    addLayer (id, geojson) {
-      this.map.addSource(id, geojson);
-        
-        // Add a new layer to visualize the polygon.
-      this.map.addLayer({
-        'id': id,
-        'type': 'fill',
-        'source': id, // reference the data source
-        'layout': {},
-        'paint': {
-        'fill-color': '#0080ff', // blue color fill
-        'fill-opacity': 0.5
-        }
-      });
-        // Add a black outline around the polygon.
-      this.map.addLayer({
-        'id': `${id}outline`,
-        'type': 'line',
-        'source': id,
-        'layout': {},
-        'paint': {
-          'line-color': '#000',
-          'line-width': 3
-        }
-      });
-    },
-
-    removeLayer (id) {
-      this.map.removeLayer(id)
-      this.map.removeLayer(id)
-      this.map.removeSource()
-    },
-
     loadLayers: function () {
+
+      const loadCutBlock = () => { 
+        this.map.addSource("cutblock", {type:'geojson', data: {
+          "type": "MultiPolygon",
+          "coordinates": [
+              [
+                  [
+                      [
+                          939478.314340071,
+                          1173604.291776027
+                      ],
+                      [
+                          934439.917095742,
+                          1023045.306959651
+                      ],
+                      [
+                          1182379.736804794,
+                          1037195.509488967
+                      ],
+                      [
+                          1169234.477294709,
+                          1173501.178577175
+                      ],
+                      [
+                          939478.314340071,
+                          1173604.291776027
+                      ]
+                  ]
+              ]
+          ]
+        }});
+
+        this.map.addLayer({
+          'id': "cutblock-layer",
+          'type': 'fill',
+          'source': "cutblock", // reference the data source
+          'layout': {'visibility': 'visible'},
+          'paint': {
+            'fill-color': '#0080ff', // blue color fill
+            'fill-opacity': 0.5
+          }
+        });
+
+        // Add a black outline around the polygon.
+        this.map.addLayer({
+          'id': "cutblock-outline",
+          'type': 'line',
+          'source': "cutblock",
+          'layout': {'visibility': 'visible'},
+          'paint': {
+            'line-color': '#000',
+            'line-width': 3
+          }
+        });
+      }
+
       // Load Fisher Range layer
       const loadFisherRange = () => {
         this.map.addSource('fisher_range', {
@@ -315,7 +338,7 @@ export default {
 
       loadFisherRange()
       loadFisherFHE()
-
+      loadCutBlock()
     },
     popupHTML: function(info) {
 
@@ -350,8 +373,12 @@ export default {
             }
        )
       .then(response => {
-        this.habitatInfo = response.data
+        this.updateCutBlockLayer(response.data.cutblock);
+        this.habitatInfo = response.data;
       })
+    },
+    updateCutBlockLayer: function(cutblockGeoJson) {
+      this.map.getSource('cutblock').setData(cutblockGeoJson);
     }
   }
 }
