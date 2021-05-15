@@ -84,6 +84,7 @@ export default {
       this.branchRestingPrimary = habitatInfo['sum_branch_resting_primary']
       this.branchRestingContingency = habitatInfo['sum_branch_resting_contingency']
       this.cavityRestingPrimary = habitatInfo['sum_cavity_resting_primary']
+      this.cavityRestingContingency = habitatInfo['sum_cavity_resting_contingency']
       this.debrisRestingPieces = habitatInfo['sum_resting_piece']
       this.debrisRestingPiles = habitatInfo['sum_resting_piles']
     }
