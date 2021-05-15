@@ -52,18 +52,10 @@
 </template>
 
 <script>
-import axios from 'axios';
 
-import {API_BASE_URL} from '../consts'
 export default {
   name: "Report",
   props: ['habitatInfo'],
-  mounted () {
-    axios.get(`${API_BASE_URL}/v1/habitat`)
-    .then(response => {
-      this.updateReport(response.data)
-    })
-  },
   data: function() {
     return {
       analysisDate: null,

@@ -38,6 +38,7 @@ export default {
   },
   data () {
     return {
+      file: null,
       habitatInfo: null
     }
   },
@@ -207,68 +208,51 @@ export default {
     },
 
     generateReport: function () {
-      console.log('update report:');
-      console.log(this.draw.getAll());
-      
-      axios.post(`${API_BASE_URL}/v1/process_drawing`,  { shape: JSON.stringify(this.draw.getAll())})
+      const drawnCutblock = this.draw.getAll();
+      axios.post(`${API_BASE_URL}/v1/process_drawing`,  { shape: JSON.stringify(drawnCutblock)})
       .then(response => {
-        this.updateCutBlockLayer(response.data.cutblock);
+        this.updateCutBlockLayers(response.data);
         this.habitatInfo = response.data
       })
     },
     loadLayers: function () {
 
       const loadCutBlock = () => { 
-        this.map.addSource("cutblock", {type:'geojson', data: {
-          "type": "MultiPolygon",
-          "coordinates": [
-              [
-                  [
-                      [
-                          939478.314340071,
-                          1173604.291776027
-                      ],
-                      [
-                          934439.917095742,
-                          1023045.306959651
-                      ],
-                      [
-                          1182379.736804794,
-                          1037195.509488967
-                      ],
-                      [
-                          1169234.477294709,
-                          1173501.178577175
-                      ],
-                      [
-                          939478.314340071,
-                          1173604.291776027
-                      ]
-                  ]
-              ]
-          ]
-        }});
+        this.map.addSource("cutblock", { type:'geojson', data: {"type": "FeatureCollection", "features": []}});
+        this.map.addSource("yellow_polygons", { type:'geojson', data: {"type": "FeatureCollection", "features": []}});
+        this.map.addSource("red_polygons", { type:'geojson', data: {"type": "FeatureCollection", "features": []}});
 
         this.map.addLayer({
-          'id': "cutblock-layer",
+          'id': "yellow_polygons",
           'type': 'fill',
-          'source': "cutblock", // reference the data source
-          'layout': {'visibility': 'visible'},
+          'source': "yellow_polygons",
+          'layout': {},
           'paint': {
-            'fill-color': '#0080ff', // blue color fill
+            'fill-color': '#fffe00',
+            'fill-opacity': 0.5
+          }
+        });
+
+        this.map.addLayer({
+          'id': "red_polygons",
+          'type': 'fill',
+          'source': "red_polygons",
+          'layout': {},
+          'paint': {
+            'fill-color': '#ff0000',
             'fill-opacity': 0.5
           }
         });
 
         // Add a black outline around the polygon.
         this.map.addLayer({
-          'id': "cutblock-outline",
+          'id': "cutblock",
           'type': 'line',
           'source': "cutblock",
-          'layout': {'visibility': 'visible'},
+          'layout': {},
           'paint': {
             'line-color': '#000',
-            'line-width': 3
+            'line-width': 2
           }
         });
       }
@@ -373,12 +357,14 @@ export default {
             }
        )
       .then(response => {
-        this.updateCutBlockLayer(response.data.cutblock);
+        this.updateCutBlockLayers(response.data);
         this.habitatInfo = response.data;
       })
     },
-    updateCutBlockLayer: function(cutblockGeoJson) {
-      this.map.getSource('cutblock').setData(cutblockGeoJson);
+    updateCutBlockLayers: function(data) {
+      this.map.getSource('cutblock').setData(data.cutblock);
+      this.map.getSource('yellow_polygons').setData(data.yellow_polygons);
+      this.map.getSource('red_polygons').setData(data.red_polygons);
     }
   }
 }

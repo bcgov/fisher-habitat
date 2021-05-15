@@ -10,18 +10,21 @@ from app.fisher.cutblocks import load_cutblock
 from app.config import DATABASE_URI
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-import os 
+import os
 
 router = APIRouter()
 logger = logging.getLogger('api')
 
+
 def bgtask():
     time.sleep(1)
+
 
 @router.get('/hello/{hi}')
 def hello_world(hi: str):
     """ function goes here """
     return hi
+
 
 @router.get('/background')
 def background(background_tasks: BackgroundTasks):
@@ -41,6 +44,7 @@ def dbexample(db: Session = Depends(get_db)):
     result = result.fetchone()[0]
 
     return result
+
 
 def habitat_in_polygon(cutblock, db):
     """
@@ -124,54 +128,44 @@ def habitat_in_polygon(cutblock, db):
             ) t
         ) as red_polygons,
         NOW() as create_date,
-        MIN(version) as version,
-        ST_AsGeoJSON(:cutblock)::json as cutblock
-
+        MIN(version) as version
     from fisher_habitats
     """
 
-    # sample_cutblock = load_cutblock('/app/fixtures/cutblocks_sample.shp')
-
-    result = db.execute(
-        q,
-        {
-            "cutblock":cutblock.wkt
-        }
-    )
-
+    result = db.execute(q, {"cutblock": cutblock.wkt})
     result = dict(result.fetchone())
 
     return result
 
-  
+
 @router.post("/process_file")
-async def upload_file(shape: UploadFile = File(...), db: Session = Depends(get_db)):
+async def upload_file(shape: UploadFile = File(...),
+                      db: Session = Depends(get_db)):
     print(shape.file)
     try:
         os.mkdir("shapes")
         print(os.getcwd())
     except Exception as e:
-        print(e) 
-    file_name = os.getcwd()+"/shapes/"+shape.filename.replace(" ", "-")
-    with open(file_name,'wb+') as f:
+        print(e)
+    file_name = os.getcwd() + "/shapes/" + shape.filename.replace(" ", "-")
+    with open(file_name, 'wb+') as f:
         f.write(shape.file.read())
         f.close()
-    
-    # file = jsonable_encoder({"imagePath":file_name})
 
-    this_cutblock = load_cutblock(file_name)
+    this_cutblock, cutblock_geojson = load_cutblock(file_name)
     result = habitat_in_polygon(this_cutblock, db)
+    result['cutblock'] = cutblock_geojson
     return result
 
 
 class ShapeRequest(BaseModel):
     shape: str
 
+
 @router.post("/process_drawing")
 def upload_drawing(payload: ShapeRequest, db: Session = Depends(get_db)):
     shape = payload.dict().get("shape")
-    this_cutblock = load_cutblock(shape)
-    print(this_cutblock)
+    this_cutblock, cutblock_geojson = load_cutblock(shape)
     result = habitat_in_polygon(this_cutblock, db)
-
+    result['cutblock'] = cutblock_geojson
     return result
