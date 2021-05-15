@@ -38,6 +38,7 @@ export default {
   },
   data () {
     return {
+      file: null,
       habitatInfo: null
     }
   },
@@ -207,49 +208,55 @@ export default {
     },
 
     generateReport: function () {
-      console.log('update report:');
-      console.log(this.draw.getAll());
-      
-      axios.post(`${API_BASE_URL}/v1/process_drawing`,  { shape: JSON.stringify(this.draw.getAll())})
+      const drawnCutblock = this.draw.getAll();
+      axios.post(`${API_BASE_URL}/v1/process_drawing`,  { shape: JSON.stringify(drawnCutblock)})
       .then(response => {
+        this.updateCutBlockLayers(response.data);
         this.habitatInfo = response.data
       })
     },
-
-    addLayer (id, geojson) {
-      this.map.addSource(id, geojson);
-        
-        // Add a new layer to visualize the polygon.
-      this.map.addLayer({
-        'id': id,
-        'type': 'fill',
-        'source': id, // reference the data source
-        'layout': {},
-        'paint': {
-        'fill-color': '#0080ff', // blue color fill
-        'fill-opacity': 0.5
-        }
-      });
-        // Add a black outline around the polygon.
-      this.map.addLayer({
-        'id': `${id}outline`,
-        'type': 'line',
-        'source': id,
-        'layout': {},
-        'paint': {
-          'line-color': '#000',
-          'line-width': 3
-        }
-      });
-    },
-
-    removeLayer (id) {
-      this.map.removeLayer(id)
-      this.map.removeLayer(id)
-      this.map.removeSource()
-    },
-
     loadLayers: function () {
+
+      const loadCutBlock = () => { 
+        this.map.addSource("cutblock", { type:'geojson', data: {"type": "FeatureCollection", "features": []}});
+        this.map.addSource("yellow_polygons", { type:'geojson', data: {"type": "FeatureCollection", "features": []}});
+        this.map.addSource("red_polygons", { type:'geojson', data: {"type": "FeatureCollection", "features": []}});
+
+        this.map.addLayer({
+          'id': "yellow_polygons",
+          'type': 'fill',
+          'source': "yellow_polygons",
+          'layout': {},
+          'paint': {
+            'fill-color': '#fffe00',
+            'fill-opacity': 0.5
+          }
+        });
+
+        this.map.addLayer({
+          'id': "red_polygons",
+          'type': 'fill',
+          'source': "red_polygons",
+          'layout': {},
+          'paint': {
+            'fill-color': '#ff0000',
+            'fill-opacity': 0.5
+          }
+        });
+
+        // Add a black outline around the polygon.
+        this.map.addLayer({
+          'id': "cutblock",
+          'type': 'line',
+          'source': "cutblock",
+          'layout': {},
+          'paint': {
+            'line-color': '#000',
+            'line-width': 2
+          }
+        });
+      }
+
       // Load Fisher Range layer
       const loadFisherRange = () => {
         this.map.addSource('fisher_range', {
@@ -315,7 +322,7 @@ export default {
 
       loadFisherRange()
       loadFisherFHE()
-
+      loadCutBlock()
     },
     popupHTML: function(info) {
 
@@ -350,8 +357,14 @@ export default {
             }
        )
       .then(response => {
-        this.habitatInfo = response.data
+        this.updateCutBlockLayers(response.data);
+        this.habitatInfo = response.data;
       })
+    },
+    updateCutBlockLayers: function(data) {
+      this.map.getSource('cutblock').setData(data.cutblock);
+      this.map.getSource('yellow_polygons').setData(data.yellow_polygons);
+      this.map.getSource('red_polygons').setData(data.red_polygons);
     }
   }
 }
