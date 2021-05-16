@@ -1,9 +1,8 @@
 :8080 {
   root * /srv
-  handle /tiles strip {
-    reverse_proxy http://fisher-pgtilserv:4000
-  }
-  reverse_proxy /api/* http://fisher-api:8000
+
+  reverse_proxy /tiles/* http://fisher-pgtilserv:7800
+  reverse_proxy /api/* http://fisher-habitat:8000
 
   try_files {path} /index.html
   file_server
