@@ -7,3 +7,13 @@
   try_files {path} /index.html
   file_server
 }
+
+:2016 {
+    respond /health 200
+    
+    log {
+      # errors stdout
+      output discard 
+      #format single_field common_log
+  }
+}
