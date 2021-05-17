@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.execute("""
-        create table fisher_poly (id serial, geom GEOMETRY(MultiPolygon, 4326), harvest_im text); 
+        CREATE EXTENSION IF NOT EXISTS POSTGIS
     """)
 
 
