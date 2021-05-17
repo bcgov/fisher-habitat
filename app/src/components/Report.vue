@@ -78,6 +78,7 @@ export default {
     updateReport (habitatInfo) {
       this.analysisDate = habitatInfo['create_date']
       this.retentionSpatialDataVersion = habitatInfo['version']
+      this.shapeArea = habitatInfo['cutblock_area']
       this.harvestImpactWarning = habitatInfo['sum_denning_warning'] // TODO: Is this the right field?
       this.denningContingency = habitatInfo['sum_denning_contingency'] 
       this.denningPrimary = habitatInfo['sum_denning_primary']
