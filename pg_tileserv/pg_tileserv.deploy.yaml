@@ -12,10 +12,6 @@ parameters:
     value: image-registry.openshift-image-registry.svc:5000
   - name: IMAGE_NAMESPACE
     value: 06dc2b-prod
-  - name: NAME_SUFFIX
-    required: true
-  - name: DATABASE_SERVICE_NAME
-    required: true
   - description: Request for CPU resources measured in cpu units, e.g. 200m
     displayName: CPU resource request
     name: REQUEST_CPU
@@ -36,19 +32,17 @@ parameters:
     name: LIMIT_MEMORY
     required: false
     value: 512Mi
-  - name: HOST
-    required: true
 objects:
   - apiVersion: v1
     kind: Service
     metadata:
-      name: pgtileserv${NAME_SUFFIX}
+      name: fisher-pgtileserv
     spec:
       ports:
         - port: 8080
           protocol: TCP
       selector:
-        name: pgtileserv${NAME_SUFFIX}
+        name: fisher-pgtileserv
       sessionAffinity: None
       type: ClusterIP
     status:
@@ -56,18 +50,18 @@ objects:
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
-      name: pgtileserv${NAME_SUFFIX}
+      name: fisher-pgtileserv
     spec:
       replicas: 1
       selector:
-        name: pgtileserv${NAME_SUFFIX}
+        name: fisher-pgtileserv
       strategy:
         type: Rolling
       template:
         metadata:
           labels:
             app: fisher
-            name: pgtileserv${NAME_SUFFIX}
+            name: fisher-pgtileserv
             appver: fisher
         spec:
           volumes:

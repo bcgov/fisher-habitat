@@ -1,7 +1,7 @@
 :8080 {
   root * /srv
   route {
-    reverse_proxy /tiles/* http://fisher-pgtilserv:7800
+    reverse_proxy /tiles/* http://fisher-pgtileserv:8080
     reverse_proxy /api/* http://fisher-habitat:8000
     try_files {path} /index.html
     file_server
