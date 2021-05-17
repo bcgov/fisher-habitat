@@ -127,6 +127,7 @@ def habitat_in_polygon(cutblock, db):
                 from fisher_habitats where harvest_im ilike 'WARNING: Harvest of this exceptionally rare%'
             ) t
         ) as red_polygons,
+        (select ROUND((ST_Area(geom)/10000)::numeric, 1) from cutblock) as cutblock_area,
         NOW() as create_date,
         MIN(version) as version
     from fisher_habitats
