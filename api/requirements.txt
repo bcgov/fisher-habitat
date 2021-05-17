@@ -45,3 +45,4 @@ Fiona==1.8.19
 Shapely==1.7.1
 geojson==2.5.0
 pyproj==3.0.1 
+gunicorn==20.1.0
